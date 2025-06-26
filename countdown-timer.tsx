@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Target, Zap, Plus, CheckCircle, Code, BookOpen, Calendar, Droplets } from "lucide-react"
+import { Target, Zap, Plus, CheckCircle, Code, BookOpen, Calendar, Droplets, ExternalLink } from "lucide-react"
+import DSALearningPage from "./dsa-learning-page"
 
 interface TimeLeft {
   days: number
@@ -70,18 +71,23 @@ const achieverQuotes = [
 ]
 
 const developmentSkills = [
-  "JavaScript/TypeScript",
-  "React/Next.js",
-  "Node.js",
-  "Database Design",
-  "System Design",
-  "Data Structures",
-  "Algorithms",
-  "Git/Version Control",
-  "Testing",
-  "DevOps/CI/CD",
-  "API Design",
-  "Security Best Practices",
+  { name: "JavaScript/TypeScript", clickable: false },
+  { name: "React/Next.js", clickable: false },
+  { name: "Node.js", clickable: false },
+  { name: "Database Design", clickable: false },
+  { name: "System Design", clickable: false },
+  { name: "Data Structures", clickable: true },
+  { name: "Algorithms", clickable: false },
+  { name: "Git/Version Control", clickable: false },
+  { name: "Testing", clickable: false },
+  {
+    name: "DevOps/CI/CD",
+    clickable: true,
+    isExternal: true,
+    url: "https://app.eraser.io/workspace/Q8CsIzdL4RfBVO6aK5BN",
+  },
+  { name: "API Design", clickable: false },
+  { name: "Security Best Practices", clickable: false },
 ]
 
 export default function CountdownTimer() {
@@ -97,6 +103,7 @@ export default function CountdownTimer() {
   const [isClient, setIsClient] = useState(false)
   const [currentQuote, setCurrentQuote] = useState(0)
   const [progressPercentage, setProgressPercentage] = useState(0)
+  const [currentPage, setCurrentPage] = useState<"dashboard" | "dsa">("dashboard")
   const [dailyData, setDailyData] = useState<DailyData>({
     date: "",
     tasks: [],
@@ -110,7 +117,6 @@ export default function CountdownTimer() {
   const [newTask, setNewTask] = useState("")
   const [taskCategory, setTaskCategory] = useState<Task["category"]>("development")
   const [waterAmount, setWaterAmount] = useState("250")
-  const [lastWaterReminder, setLastWaterReminder] = useState<number>(0)
 
   const today = new Date().toDateString()
 
@@ -258,7 +264,6 @@ export default function CountdownTimer() {
   }
 
   const deleteTask = (taskId: string) => {
-    const taskToDelete = dailyData.tasks.find((task) => task.id === taskId)
     const updatedTasks = dailyData.tasks.filter((task) => task.id !== taskId)
     const completedCount = updatedTasks.filter((task) => task.completed).length
 
@@ -297,6 +302,16 @@ export default function CountdownTimer() {
     saveDailyData(updatedData)
   }
 
+  const handleSkillClick = (skill: (typeof developmentSkills)[0]) => {
+    if (!skill.clickable) return
+
+    if (skill.isExternal && skill.url) {
+      window.open(skill.url, "_blank", "noopener,noreferrer")
+    } else if (skill.name === "Data Structures") {
+      setCurrentPage("dsa")
+    }
+  }
+
   const getCategoryIcon = (category: Task["category"]) => {
     switch (category) {
       case "development":
@@ -333,6 +348,10 @@ export default function CountdownTimer() {
         </Card>
       </div>
     )
+  }
+
+  if (currentPage === "dsa") {
+    return <DSALearningPage onBack={() => setCurrentPage("dashboard")} />
   }
 
   const taskCompletionRate = dailyData.totalTasks > 0 ? (dailyData.completedTasks / dailyData.totalTasks) * 100 : 0
@@ -561,9 +580,15 @@ export default function CountdownTimer() {
                   {developmentSkills.slice(0, 8).map((skill, index) => (
                     <div
                       key={index}
-                      className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded border border-blue-500/30"
+                      onClick={() => handleSkillClick(skill)}
+                      className={`text-xs px-2 py-1 rounded border flex items-center gap-1 ${
+                        skill.clickable
+                          ? "bg-blue-500/20 text-blue-300 border-blue-500/30 cursor-pointer hover:bg-blue-500/30 hover:border-blue-400/50 transition-colors"
+                          : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                      }`}
                     >
-                      {skill}
+                      {skill.name}
+                      {skill.isExternal && <ExternalLink className="h-3 w-3" />}
                     </div>
                   ))}
                 </div>
