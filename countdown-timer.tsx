@@ -75,11 +75,9 @@ const developmentSkills = [
   { name: "React/Next.js", clickable: false },
   { name: "Node.js", clickable: false },
   { name: "Database Design", clickable: false },
-  { name: "System Design", clickable: false },
   { name: "Data Structures", clickable: true },
   { name: "Algorithms", clickable: false },
   { name: "Git/Version Control", clickable: false },
-  { name: "Testing", clickable: false },
   {
     name: "DevOps/CI/CD",
     clickable: true,
